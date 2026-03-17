@@ -34,7 +34,7 @@ export default function CustomerView() {
       }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: 2, marginBottom: 12 }}>
-            🍽 RESTO<span style={{ color: '#f59e0b' }}>MENÚ</span>
+            🍽 Tortas y Tacos <span style={{ color: '#f59e0b' }}>"Mary"</span>
           </div>
           <input
             placeholder="🔍  Buscar..."
