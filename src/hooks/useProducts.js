@@ -48,10 +48,9 @@ export function useProducts({ onlyAvailable = false } = {}) {
         .update({ ...payload, updated_at: new Date().toISOString() })
         .eq('id', id)
         .select()
-        .single()
       if (error) throw error
-      setProducts(prev => prev.map(p => p.id === id ? data : p))
-      return { success: true, data }
+      setProducts(prev => prev.map(p => p.id === id ? data[0] : p))
+      return { success: true, data: data[0] }
     } catch (err) {
       return { success: false, error: err.message }
     }
