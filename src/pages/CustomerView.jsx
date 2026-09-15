@@ -152,7 +152,7 @@ export default function CustomerView() {
                 onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = COLORS.border }}>
                 {item.image_url
                   ? <img src={item.image_url} alt={item.name} style={{ width: '100%', height: 130, objectFit: 'cover' }} />
-                  : <div style={{ height: 130, background: COLORS.surface2, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 44 }}>{item.emoji}</div>
+                  : <div style={{ height: 130, background: COLORS.surface2, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: COLORS.textMuted, letterSpacing: 2 }}>SIN IMAGEN</div>
                 }
                 <div style={{ padding: '10px 12px 14px' }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.text, marginBottom: 6, lineHeight: 1.3 }}>{item.name}</div>

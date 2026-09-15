@@ -4,11 +4,14 @@ import { useProducts } from '../hooks/useProducts'
 import { FONT_MONO, COLORS } from '../data/constants'
 import toast, { Toaster } from 'react-hot-toast'
 
-// — Formulario vacío reutilizable
 const EMPTY_FORM = {
-  name: '', price: '', description: '',
-  category: '', emoji: '', available: true, featured: false,
-  preparation_time: '', image_url: '',
+  name:        '',
+  price:       '',
+  description: '',
+  category:    '',
+  available:   true,
+  featured:    false,
+  image_url:   '',
 }
 
 export default function AdminView() {
@@ -18,14 +21,14 @@ export default function AdminView() {
     createProduct, updateProduct, deleteProduct, uploadImage,
   } = useProducts()
 
-  const [search, setSearch]           = useState('')
-  const [filterCat, setFilterCat]     = useState('Todos')
-  const [showForm, setShowForm]       = useState(false)
-  const [editingId, setEditingId]     = useState(null)
-  const [form, setForm]               = useState(EMPTY_FORM)
-  const [imageFile, setImageFile]     = useState(null)
+  const [search, setSearch]             = useState('')
+  const [filterCat, setFilterCat]       = useState('Todos')
+  const [showForm, setShowForm]         = useState(false)
+  const [editingId, setEditingId]       = useState(null)
+  const [form, setForm]                 = useState(EMPTY_FORM)
+  const [imageFile, setImageFile]       = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
-  const [saving, setSaving]           = useState(false)
+  const [saving, setSaving]             = useState(false)
 
   const categories = ['Todos', ...Array.from(new Set(products.map(p => p.category)))]
 
@@ -35,7 +38,6 @@ export default function AdminView() {
     return matchCat && matchSearch
   })
 
-  // — Abrir formulario para crear
   function handleNew() {
     setEditingId(null)
     setForm(EMPTY_FORM)
@@ -44,26 +46,22 @@ export default function AdminView() {
     setShowForm(true)
   }
 
-  // — Abrir formulario para editar
   function handleEdit(product) {
     setEditingId(product.id)
     setForm({
-      name:             product.name,
-      price:            product.price,
-      description:      product.description || '',
-      category:         product.category,
-      emoji:            product.emoji || '',
-      available:        product.available,
-      featured:         product.featured,
-      preparation_time: product.preparation_time || '',
-      image_url:        product.image_url || '',
+      name:        product.name,
+      price:       product.price,
+      description: product.description || '',
+      category:    product.category,
+      available:   product.available,
+      featured:    product.featured,
+      image_url:   product.image_url || '',
     })
     setImageFile(null)
     setImagePreview(product.image_url || null)
     setShowForm(true)
   }
 
-  // — Cerrar formulario
   function handleCancel() {
     setShowForm(false)
     setEditingId(null)
@@ -72,7 +70,6 @@ export default function AdminView() {
     setImagePreview(null)
   }
 
-  // — Preview de imagen seleccionada
   function handleImageChange(e) {
     const file = e.target.files[0]
     if (!file) return
@@ -80,7 +77,6 @@ export default function AdminView() {
     setImagePreview(URL.createObjectURL(file))
   }
 
-  // — Guardar (crear o editar)
   async function handleSave() {
     if (!form.name || !form.price || !form.category) {
       toast.error('Nombre, precio y categoría son obligatorios')
@@ -93,7 +89,6 @@ export default function AdminView() {
     try {
       let image_url = form.image_url
 
-      // Subir imagen si se seleccionó una nueva
       if (imageFile) {
         const { success, url, error } = await uploadImage(imageFile)
         if (!success) throw new Error(error)
@@ -101,15 +96,13 @@ export default function AdminView() {
       }
 
       const payload = {
-        name:             form.name.trim(),
-        price:            parseFloat(form.price),
-        description:      form.description.trim() || null,
-        category:         form.category.trim(),
-        emoji:            form.emoji.trim() || null,
-        available:        form.available,
-        featured:         form.featured,
-        preparation_time: form.preparation_time ? parseInt(form.preparation_time) : null,
-        image_url,
+        name:        form.name.trim(),
+        price:       parseFloat(form.price),
+        description: form.description.trim() || null,
+        category:    form.category.trim(),
+        available:   form.available,
+        featured:    form.featured,
+        image_url:   image_url || null,
       }
 
       const result = editingId
@@ -127,7 +120,6 @@ export default function AdminView() {
     }
   }
 
-  // — Eliminar con confirmación
   async function handleDelete(product) {
     if (!window.confirm(`¿Eliminar "${product.name}"? Esta acción no se puede deshacer.`)) return
     const toastId = toast.loading('Eliminando...')
@@ -139,13 +131,11 @@ export default function AdminView() {
     }
   }
 
-  // — Toggle disponibilidad rápido
   async function handleToggleAvailable(product) {
     const { success, error } = await updateProduct(product.id, { available: !product.available })
     if (!success) toast.error(error)
   }
 
-  // — Toggle destacado rápido
   async function handleToggleFeatured(product) {
     const { success, error } = await updateProduct(product.id, { featured: !product.featured })
     if (!success) toast.error(error)
@@ -155,31 +145,23 @@ export default function AdminView() {
     width: '100%', boxSizing: 'border-box',
     background: COLORS.surface2,
     border: `1px solid ${COLORS.border2}`,
-    color: COLORS.text,
-    padding: '9px 12px',
-    borderRadius: 6,
-    fontSize: 12,
-    fontFamily: FONT_MONO,
-    outline: 'none',
+    color: COLORS.text, padding: '9px 12px',
+    borderRadius: 6, fontSize: 12,
+    fontFamily: FONT_MONO, outline: 'none',
   }
 
   const labelStyle = {
-    fontSize: 10,
-    color: COLORS.textMuted,
-    letterSpacing: 2,
-    marginBottom: 4,
-    display: 'block',
+    fontSize: 10, color: COLORS.textMuted,
+    letterSpacing: 2, marginBottom: 4, display: 'block',
   }
 
   return (
     <div style={{ fontFamily: FONT_MONO, background: COLORS.bg, minHeight: '100vh', color: COLORS.text }}>
       <Toaster position="top-right" toastOptions={{
         style: {
-          background: COLORS.surface,
-          color: COLORS.text,
+          background: COLORS.surface, color: COLORS.text,
           border: `1px solid ${COLORS.border2}`,
-          fontFamily: FONT_MONO,
-          fontSize: 12,
+          fontFamily: FONT_MONO, fontSize: 12,
         }
       }} />
 
@@ -187,14 +169,9 @@ export default function AdminView() {
       <header style={{
         background: COLORS.surface,
         borderBottom: `1px solid ${COLORS.border}`,
-        padding: '0 24px',
-        height: 56,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 16,
-        position: 'sticky',
-        top: 0,
-        zIndex: 20,
+        padding: '0 24px', height: 56,
+        display: 'flex', alignItems: 'center', gap: 16,
+        position: 'sticky', top: 0, zIndex: 20,
       }}>
         <span style={{ fontSize: 18 }}>🍽</span>
         <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: 2 }}>
@@ -231,8 +208,7 @@ export default function AdminView() {
       <div style={{
         padding: '16px 24px',
         borderBottom: `1px solid ${COLORS.border}`,
-        display: 'flex', gap: 10, flexWrap: 'wrap',
-        alignItems: 'center',
+        display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center',
       }}>
         <input
           placeholder="Buscar producto..."
@@ -245,16 +221,15 @@ export default function AdminView() {
             <button key={cat} onClick={() => setFilterCat(cat)} style={{
               background: filterCat === cat ? COLORS.accent : COLORS.surface2,
               color: filterCat === cat ? '#000' : COLORS.textDim,
-              border: 'none', padding: '6px 14px',
-              borderRadius: 4, fontSize: 11,
-              cursor: 'pointer', fontFamily: FONT_MONO,
+              border: 'none', padding: '6px 14px', borderRadius: 4,
+              fontSize: 11, cursor: 'pointer', fontFamily: FONT_MONO,
               fontWeight: filterCat === cat ? 700 : 400,
             }}>{cat}</button>
           ))}
         </div>
       </div>
 
-      {/* TABLA DE PRODUCTOS */}
+      {/* TABLA */}
       <div style={{ padding: '20px 24px' }}>
         {loading && (
           <div style={{ textAlign: 'center', color: COLORS.textMuted, fontSize: 12, marginTop: 60 }}>
@@ -281,10 +256,8 @@ export default function AdminView() {
             </thead>
             <tbody>
               {filtered.map(product => (
-                <tr key={product.id} style={{
-                  borderBottom: `1px solid ${COLORS.border}`,
-                  transition: 'background 0.1s',
-                }}
+                <tr key={product.id}
+                  style={{ borderBottom: `1px solid ${COLORS.border}`, transition: 'background 0.1s' }}
                   onMouseEnter={e => e.currentTarget.style.background = COLORS.surface}
                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
 
@@ -293,7 +266,7 @@ export default function AdminView() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       {product.image_url
                         ? <img src={product.image_url} alt={product.name} style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: 6 }} />
-                        : <div style={{ width: 36, height: 36, background: COLORS.surface2, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>{product.emoji || '🍽'}</div>
+                        : <div style={{ width: 36, height: 36, background: COLORS.surface2, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: COLORS.textMuted }}>IMG</div>
                       }
                       <div>
                         <div style={{ color: COLORS.text, fontWeight: 700 }}>{product.name}</div>
@@ -307,7 +280,9 @@ export default function AdminView() {
                   </td>
 
                   {/* Categoría */}
-                  <td style={{ padding: '10px 12px', color: COLORS.textDim }}>{product.category}</td>
+                  <td style={{ padding: '10px 12px', color: COLORS.textDim }}>
+                    {product.category}
+                  </td>
 
                   {/* Precio */}
                   <td style={{ padding: '10px 12px', color: COLORS.accent, fontWeight: 700 }}>
@@ -321,7 +296,8 @@ export default function AdminView() {
                       color: product.available ? '#34d399' : COLORS.textMuted,
                       border: `1px solid ${product.available ? '#34d399' : COLORS.border2}`,
                       padding: '3px 10px', borderRadius: 4,
-                      fontSize: 10, cursor: 'pointer', fontFamily: FONT_MONO, fontWeight: 700,
+                      fontSize: 10, cursor: 'pointer',
+                      fontFamily: FONT_MONO, fontWeight: 700,
                     }}>
                       {product.available ? 'SÍ' : 'NO'}
                     </button>
@@ -334,7 +310,8 @@ export default function AdminView() {
                       color: product.featured ? COLORS.accent : COLORS.textMuted,
                       border: `1px solid ${product.featured ? COLORS.accent : COLORS.border2}`,
                       padding: '3px 10px', borderRadius: 4,
-                      fontSize: 10, cursor: 'pointer', fontFamily: FONT_MONO, fontWeight: 700,
+                      fontSize: 10, cursor: 'pointer',
+                      fontFamily: FONT_MONO, fontWeight: 700,
                     }}>
                       {product.featured ? 'SÍ' : 'NO'}
                     </button>
@@ -346,16 +323,16 @@ export default function AdminView() {
                       <button onClick={() => handleEdit(product)} style={{
                         background: COLORS.surface2,
                         border: `1px solid ${COLORS.border2}`,
-                        color: COLORS.textDim,
-                        padding: '5px 12px', borderRadius: 4,
-                        fontSize: 10, cursor: 'pointer', fontFamily: FONT_MONO,
+                        color: COLORS.textDim, padding: '5px 12px',
+                        borderRadius: 4, fontSize: 10,
+                        cursor: 'pointer', fontFamily: FONT_MONO,
                       }}>EDITAR</button>
                       <button onClick={() => handleDelete(product)} style={{
                         background: COLORS.dangerBg,
                         border: `1px solid ${COLORS.danger}33`,
-                        color: COLORS.danger,
-                        padding: '5px 12px', borderRadius: 4,
-                        fontSize: 10, cursor: 'pointer', fontFamily: FONT_MONO,
+                        color: COLORS.danger, padding: '5px 12px',
+                        borderRadius: 4, fontSize: 10,
+                        cursor: 'pointer', fontFamily: FONT_MONO,
                       }}>ELIMINAR</button>
                     </div>
                   </td>
@@ -376,16 +353,15 @@ export default function AdminView() {
       {showForm && (
         <div onClick={handleCancel} style={{
           position: 'fixed', inset: 0,
-          background: 'rgba(0,0,0,0.8)',
-          zIndex: 50, display: 'flex',
-          alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.8)', zIndex: 50,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: 16, animation: 'fadeIn 0.2s ease',
         }}>
           <div onClick={e => e.stopPropagation()} style={{
             background: COLORS.surface,
             border: `1px solid ${COLORS.border}`,
             borderRadius: 12, width: '100%',
-            maxWidth: 520, maxHeight: '90vh',
+            maxWidth: 480, maxHeight: '90vh',
             overflowY: 'auto', padding: 24,
           }}>
             <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 20, color: COLORS.text }}>
@@ -398,15 +374,16 @@ export default function AdminView() {
               <div>
                 <label style={labelStyle}>IMAGEN</label>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                  {imagePreview && (
-                    <img src={imagePreview} alt="preview" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8 }} />
-                  )}
+                  {imagePreview
+                    ? <img src={imagePreview} alt="preview" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8 }} />
+                    : <div style={{ width: 64, height: 64, background: COLORS.surface2, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: COLORS.textMuted }}>SIN IMG</div>
+                  }
                   <label style={{
                     background: COLORS.surface2,
                     border: `1px dashed ${COLORS.border2}`,
-                    color: COLORS.textDim,
-                    padding: '8px 16px', borderRadius: 6,
-                    fontSize: 11, cursor: 'pointer', fontFamily: FONT_MONO,
+                    color: COLORS.textDim, padding: '8px 16px',
+                    borderRadius: 6, fontSize: 11,
+                    cursor: 'pointer', fontFamily: FONT_MONO,
                   }}>
                     {imagePreview ? 'CAMBIAR IMAGEN' : 'SUBIR IMAGEN'}
                     <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
@@ -417,37 +394,47 @@ export default function AdminView() {
               {/* Nombre */}
               <div>
                 <label style={labelStyle}>NOMBRE *</label>
-                <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Ej: Torta de Pierna" style={inputStyle} />
+                <input
+                  value={form.name}
+                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  placeholder="Ej: Torta de Pierna"
+                  style={inputStyle}
+                />
               </div>
 
               {/* Precio y Categoría */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
                   <label style={labelStyle}>PRECIO (Q) *</label>
-                  <input type="number" min="0" step="0.50" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="0.00" style={inputStyle} />
+                  <input
+                    type="number" min="0" step="0.50"
+                    value={form.price}
+                    onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
+                    placeholder="0.00"
+                    style={inputStyle}
+                  />
                 </div>
                 <div>
                   <label style={labelStyle}>CATEGORÍA *</label>
-                  <input value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder="Ej: Tortas" style={inputStyle} />
+                  <input
+                    value={form.category}
+                    onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
+                    placeholder="Ej: Tortas"
+                    style={inputStyle}
+                  />
                 </div>
               </div>
 
               {/* Descripción */}
               <div>
                 <label style={labelStyle}>DESCRIPCIÓN</label>
-                <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Describe el producto..." rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
-              </div>
-
-              {/* Emoji y Tiempo */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <div>
-                  <label style={labelStyle}>EMOJI (respaldo)</label>
-                  <input value={form.emoji} onChange={e => setForm(f => ({ ...f, emoji: e.target.value }))} placeholder="🍔" style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>TIEMPO PREP. (min)</label>
-                  <input type="number" min="0" value={form.preparation_time} onChange={e => setForm(f => ({ ...f, preparation_time: e.target.value }))} placeholder="15" style={inputStyle} />
-                </div>
+                <textarea
+                  value={form.description}
+                  onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                  placeholder="Describe el producto..."
+                  rows={3}
+                  style={{ ...inputStyle, resize: 'vertical' }}
+                />
               </div>
 
               {/* Checkboxes */}

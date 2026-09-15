@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 
 export function useProducts({ onlyAvailable = false } = {}) {
-  const [products, setProducts]   = useState([])
-  const [loading, setLoading]     = useState(true)
-  const [error, setError]         = useState(null)
+  const [products, setProducts] = useState([])
+  const [loading, setLoading]   = useState(true)
+  const [error, setError]       = useState(null)
 
   const fetchProducts = useCallback(async () => {
     setLoading(true)
@@ -26,8 +26,6 @@ export function useProducts({ onlyAvailable = false } = {}) {
   useEffect(() => {
     fetchProducts()
   }, [fetchProducts])
-
-  // — CRUD —
 
   async function createProduct(payload) {
     try {
@@ -91,13 +89,8 @@ export function useProducts({ onlyAvailable = false } = {}) {
   }
 
   return {
-    products,
-    loading,
-    error,
+    products, loading, error,
     refetch: fetchProducts,
-    createProduct,
-    updateProduct,
-    deleteProduct,
-    uploadImage,
+    createProduct, updateProduct, deleteProduct, uploadImage,
   }
 }
