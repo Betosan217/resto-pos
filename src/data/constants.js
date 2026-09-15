@@ -1,6 +1,6 @@
 // Fuente única de verdad para categorías por defecto
 // Se complementa con las que vengan dinámicamente de Supabase
-export const FONT_MONO = "'JetBrains Mono', 'Courier New', monospace"
+export const FONT_MONO = "'Inter', 'Segoe UI', sans-serif"
 
 export const COLORS = {
   bg:        '#0d0d0d',

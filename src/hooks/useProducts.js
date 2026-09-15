@@ -32,7 +32,7 @@ export function useProducts({ onlyAvailable = false } = {}) {
       const { data, error } = await supabase
         .from('products')
         .insert(payload)
-        .select()  // ← quita el .single()
+        .select()
       if (error) throw error
       setProducts(prev => [...prev, data[0]])
       return { success: true, data: data[0] }
