@@ -1,5 +1,18 @@
-export const STATUS_CONFIG = {
-  nuevo: { label: "Nuevo", color: "#3b82f6", bg: "#1e3a5f", dot: "#60a5fa" },
-  pendiente: { label: "Pendiente", color: "#f59e0b", bg: "#3d2c0a", dot: "#fbbf24" },
-  entregado: { label: "Entregado", color: "#10b981", bg: "#0a2e1f", dot: "#34d399" },
+// Fuente única de verdad para categorías por defecto
+// Se complementa con las que vengan dinámicamente de Supabase
+export const FONT_MONO = "'JetBrains Mono', 'Courier New', monospace"
+
+export const COLORS = {
+  bg:        '#0d0d0d',
+  surface:   '#111',
+  surface2:  '#1a1a1a',
+  border:    '#1f1f1f',
+  border2:   '#2a2a2a',
+  text:      '#e5e5e5',
+  textMuted: '#555',
+  textDim:   '#888',
+  accent:    '#f59e0b',
+  accentBg:  '#1a0f00',
+  danger:    '#ef4444',
+  dangerBg:  '#1a0a0a',
 }

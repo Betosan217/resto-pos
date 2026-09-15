@@ -1,17 +1,27 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import AdminView from './pages/AdminView'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import ProtectedRoute from './components/ProtectedRoute'
+import LoginView    from './pages/LoginView'
+import AdminView    from './pages/AdminView'
 import CustomerView from './pages/CustomerView'
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/admin" element={<AdminView />} />
-        <Route path="/menu" element={<CustomerView />} />
-        <Route path="/" element={<AdminView />} />
+        {/* Pública */}
+        <Route path="/menu"  element={<CustomerView />} />
+        <Route path="/login" element={<LoginView />} />
+
+        {/* Privada */}
+        <Route path="/admin" element={
+          <ProtectedRoute>
+            <AdminView />
+          </ProtectedRoute>
+        } />
+
+        {/* Cualquier otra ruta → menú */}
+        <Route path="*" element={<Navigate to="/menu" replace />} />
       </Routes>
     </BrowserRouter>
   )
 }
-
-export default App
