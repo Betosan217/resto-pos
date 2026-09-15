@@ -29,6 +29,7 @@ export default function AdminView() {
   const [imageFile, setImageFile]       = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
   const [saving, setSaving]             = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(null)
 
   const categories = ['Todos', ...Array.from(new Set(products.map(p => p.category)))]
 
@@ -120,15 +121,16 @@ export default function AdminView() {
     }
   }
 
-  async function handleDelete(product) {
-    if (!window.confirm(`¿Eliminar "${product.name}"? Esta acción no se puede deshacer.`)) return
+  async function handleDelete() {
+    if (!confirmDelete) return
     const toastId = toast.loading('Eliminando...')
-    const { success, error } = await deleteProduct(product.id)
+    const { success, error } = await deleteProduct(confirmDelete.id)
     if (success) {
       toast.success('Producto eliminado', { id: toastId })
     } else {
       toast.error(error, { id: toastId })
     }
+    setConfirmDelete(null)
   }
 
   async function handleToggleAvailable(product) {
@@ -327,7 +329,7 @@ export default function AdminView() {
                         borderRadius: 4, fontSize: 10,
                         cursor: 'pointer', fontFamily: FONT_MONO,
                       }}>EDITAR</button>
-                      <button onClick={() => handleDelete(product)} style={{
+                      <button onClick={() => setConfirmDelete(product)} style={{
                         background: COLORS.dangerBg,
                         border: `1px solid ${COLORS.danger}33`,
                         color: COLORS.danger, padding: '5px 12px',
@@ -476,6 +478,45 @@ export default function AdminView() {
                   {saving ? 'GUARDANDO...' : editingId ? 'GUARDAR CAMBIOS' : 'CREAR PRODUCTO'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* MODAL CONFIRMAR ELIMINAR */}
+      {confirmDelete && (
+        <div onClick={() => setConfirmDelete(null)} style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(0,0,0,0.8)', zIndex: 60,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: 16, animation: 'fadeIn 0.2s ease',
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: COLORS.surface,
+            border: `1px solid ${COLORS.danger}33`,
+            borderRadius: 12, padding: 24,
+            width: '100%', maxWidth: 380,
+          }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: COLORS.text, marginBottom: 8 }}>
+              ELIMINAR PRODUCTO
+            </div>
+            <div style={{ fontSize: 12, color: COLORS.textDim, marginBottom: 20, lineHeight: 1.6 }}>
+              ¿Estás seguro que deseas eliminar <b style={{ color: COLORS.text }}>{confirmDelete.name}</b>? Esta acción no se puede deshacer.
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => setConfirmDelete(null)} style={{
+                flex: 1, background: 'transparent',
+                border: `1px solid ${COLORS.border2}`,
+                color: COLORS.textMuted, padding: '10px',
+                borderRadius: 6, cursor: 'pointer',
+                fontSize: 12, fontFamily: FONT_MONO,
+              }}>CANCELAR</button>
+              <button onClick={handleDelete} style={{
+                flex: 1, background: COLORS.dangerBg,
+                border: `1px solid ${COLORS.danger}`,
+                color: COLORS.danger, padding: '10px',
+                borderRadius: 6, cursor: 'pointer',
+                fontSize: 12, fontWeight: 700, fontFamily: FONT_MONO,
+              }}>SÍ, ELIMINAR</button>
             </div>
           </div>
         </div>
