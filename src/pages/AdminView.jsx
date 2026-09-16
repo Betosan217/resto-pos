@@ -157,6 +157,15 @@ export default function AdminView() {
     letterSpacing: 2, marginBottom: 4, display: 'block',
   }
 
+  const badgeStyle = (active, activeColor, activeBg, activeBorder) => ({
+    background: active ? activeBg : COLORS.surface2,
+    color: active ? activeColor : COLORS.textMuted,
+    border: `1px solid ${active ? activeBorder : COLORS.border2}`,
+    padding: '4px 10px', borderRadius: 4,
+    fontSize: 10, cursor: 'pointer',
+    fontFamily: FONT_MONO, fontWeight: 700,
+  })
+
   return (
     <div style={{ fontFamily: FONT_MONO, background: COLORS.bg, minHeight: '100vh', color: COLORS.text }}>
       <Toaster position="top-right" toastOptions={{
@@ -171,34 +180,31 @@ export default function AdminView() {
       <header style={{
         background: COLORS.surface,
         borderBottom: `1px solid ${COLORS.border}`,
-        padding: '0 24px', height: 56,
-        display: 'flex', alignItems: 'center', gap: 16,
+        padding: '0 16px', height: 56,
+        display: 'flex', alignItems: 'center', gap: 12,
         position: 'sticky', top: 0, zIndex: 20,
       }}>
         <span style={{ fontSize: 18 }}>🍽</span>
-        <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: 2 }}>
-          TORTAS Y TACOS <span style={{ color: COLORS.accent }}>MARY</span>
+        <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1 }}>
+          <span style={{ color: COLORS.accent }}>MARY</span>
+          <span style={{ color: COLORS.textMuted, fontSize: 10, marginLeft: 6, display: 'none' }}>Admin</span>
         </span>
-        <span style={{ color: '#333', margin: '0 4px' }}>|</span>
-        <span style={{ fontSize: 11, color: COLORS.textMuted }}>Panel de gestión</span>
 
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 12, alignItems: 'center' }}>
-          <span style={{ fontSize: 11, color: COLORS.textMuted }}>
-            {products.length} productos
-          </span>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
           <button onClick={handleNew} style={{
             background: COLORS.accent, color: '#000',
-            border: 'none', padding: '7px 16px',
+            border: 'none', padding: '7px 14px',
             borderRadius: 6, fontSize: 11, fontWeight: 700,
             cursor: 'pointer', fontFamily: FONT_MONO,
+            whiteSpace: 'nowrap',
           }}>
-            + NUEVO PRODUCTO
+            + NUEVO
           </button>
           <button onClick={signOut} style={{
             background: 'transparent',
             border: `1px solid ${COLORS.border2}`,
             color: COLORS.textMuted,
-            padding: '7px 14px', borderRadius: 6,
+            padding: '7px 12px', borderRadius: 6,
             fontSize: 11, cursor: 'pointer', fontFamily: FONT_MONO,
           }}>
             SALIR
@@ -208,31 +214,35 @@ export default function AdminView() {
 
       {/* FILTROS */}
       <div style={{
-        padding: '16px 24px',
+        padding: '12px 16px',
         borderBottom: `1px solid ${COLORS.border}`,
-        display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center',
+        display: 'flex', flexDirection: 'column', gap: 10,
       }}>
         <input
           placeholder="Buscar producto..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ ...inputStyle, width: 220 }}
+          style={inputStyle}
         />
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
           {categories.map(cat => (
             <button key={cat} onClick={() => setFilterCat(cat)} style={{
               background: filterCat === cat ? COLORS.accent : COLORS.surface2,
               color: filterCat === cat ? '#000' : COLORS.textDim,
-              border: 'none', padding: '6px 14px', borderRadius: 4,
+              border: 'none', padding: '6px 14px', borderRadius: 20,
               fontSize: 11, cursor: 'pointer', fontFamily: FONT_MONO,
               fontWeight: filterCat === cat ? 700 : 400,
+              whiteSpace: 'nowrap',
             }}>{cat}</button>
           ))}
         </div>
+        <div style={{ fontSize: 10, color: COLORS.textMuted }}>
+          {filtered.length} producto{filtered.length !== 1 ? 's' : ''}
+        </div>
       </div>
 
-      {/* TABLA */}
-      <div style={{ padding: '20px 24px' }}>
+      {/* CONTENIDO */}
+      <div style={{ padding: '16px' }}>
         {loading && (
           <div style={{ textAlign: 'center', color: COLORS.textMuted, fontSize: 12, marginTop: 60 }}>
             Cargando productos...
@@ -243,105 +253,88 @@ export default function AdminView() {
             Error: {error}
           </div>
         )}
+
+        {/* CARDS — responsivo */}
         {!loading && !error && (
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-            <thead>
-              <tr style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-                {['Producto', 'Categoría', 'Precio', 'Disponible', 'Destacado', 'Acciones'].map(h => (
-                  <th key={h} style={{
-                    textAlign: 'left', padding: '8px 12px',
-                    fontSize: 10, color: COLORS.textMuted,
-                    letterSpacing: 2, fontWeight: 600,
-                  }}>{h.toUpperCase()}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(product => (
-                <tr key={product.id}
-                  style={{ borderBottom: `1px solid ${COLORS.border}`, transition: 'background 0.1s' }}
-                  onMouseEnter={e => e.currentTarget.style.background = COLORS.surface}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-
-                  {/* Producto */}
-                  <td style={{ padding: '10px 12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      {product.image_url
-                        ? <img src={product.image_url} alt={product.name} style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: 6 }} />
-                        : <div style={{ width: 36, height: 36, background: COLORS.surface2, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: COLORS.textMuted }}>IMG</div>
-                      }
-                      <div>
-                        <div style={{ color: COLORS.text, fontWeight: 700 }}>{product.name}</div>
-                        {product.description && (
-                          <div style={{ color: COLORS.textMuted, fontSize: 10, marginTop: 2, maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {product.description}
-                          </div>
-                        )}
-                      </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+            gap: 12,
+          }}>
+            {filtered.map(product => (
+              <div key={product.id} style={{
+                background: COLORS.surface,
+                border: `1px solid ${COLORS.border}`,
+                borderRadius: 10, overflow: 'hidden',
+              }}>
+                {/* Imagen + info principal */}
+                <div style={{ display: 'flex', gap: 12, padding: 12 }}>
+                  {product.image_url
+                    ? <img src={product.image_url} alt={product.name} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
+                    : <div style={{ width: 64, height: 64, background: COLORS.surface2, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: COLORS.textMuted, flexShrink: 0 }}>SIN IMG</div>
+                  }
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, color: COLORS.text, fontSize: 13, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {product.name}
                     </div>
-                  </td>
-
-                  {/* Categoría */}
-                  <td style={{ padding: '10px 12px', color: COLORS.textDim }}>
-                    {product.category}
-                  </td>
-
-                  {/* Precio */}
-                  <td style={{ padding: '10px 12px', color: COLORS.accent, fontWeight: 700 }}>
-                    Q{parseFloat(product.price).toFixed(2)}
-                  </td>
-
-                  {/* Disponible */}
-                  <td style={{ padding: '10px 12px' }}>
-                    <button onClick={() => handleToggleAvailable(product)} style={{
-                      background: product.available ? '#0a2e1f' : COLORS.surface2,
-                      color: product.available ? '#34d399' : COLORS.textMuted,
-                      border: `1px solid ${product.available ? '#34d399' : COLORS.border2}`,
-                      padding: '3px 10px', borderRadius: 4,
-                      fontSize: 10, cursor: 'pointer',
-                      fontFamily: FONT_MONO, fontWeight: 700,
-                    }}>
-                      {product.available ? 'SÍ' : 'NO'}
-                    </button>
-                  </td>
-
-                  {/* Destacado */}
-                  <td style={{ padding: '10px 12px' }}>
-                    <button onClick={() => handleToggleFeatured(product)} style={{
-                      background: product.featured ? COLORS.accentBg : COLORS.surface2,
-                      color: product.featured ? COLORS.accent : COLORS.textMuted,
-                      border: `1px solid ${product.featured ? COLORS.accent : COLORS.border2}`,
-                      padding: '3px 10px', borderRadius: 4,
-                      fontSize: 10, cursor: 'pointer',
-                      fontFamily: FONT_MONO, fontWeight: 700,
-                    }}>
-                      {product.featured ? 'SÍ' : 'NO'}
-                    </button>
-                  </td>
-
-                  {/* Acciones */}
-                  <td style={{ padding: '10px 12px' }}>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <button onClick={() => handleEdit(product)} style={{
-                        background: COLORS.surface2,
-                        border: `1px solid ${COLORS.border2}`,
-                        color: COLORS.textDim, padding: '5px 12px',
-                        borderRadius: 4, fontSize: 10,
-                        cursor: 'pointer', fontFamily: FONT_MONO,
-                      }}>EDITAR</button>
-                      <button onClick={() => setConfirmDelete(product)} style={{
-                        background: COLORS.dangerBg,
-                        border: `1px solid ${COLORS.danger}33`,
-                        color: COLORS.danger, padding: '5px 12px',
-                        borderRadius: 4, fontSize: 10,
-                        cursor: 'pointer', fontFamily: FONT_MONO,
-                      }}>ELIMINAR</button>
+                    <div style={{ fontSize: 10, color: COLORS.textMuted, marginBottom: 6 }}>
+                      {product.category}
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: COLORS.accent }}>
+                      Q{parseFloat(product.price).toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Descripción */}
+                {product.description && (
+                  <div style={{
+                    padding: '0 12px 10px',
+                    fontSize: 11, color: COLORS.textMuted,
+                    lineHeight: 1.5,
+                    borderBottom: `1px solid ${COLORS.border}`,
+                  }}>
+                    {product.description}
+                  </div>
+                )}
+
+                {/* Badges + acciones */}
+                <div style={{
+                  padding: '10px 12px',
+                  display: 'flex', alignItems: 'center',
+                  gap: 6, flexWrap: 'wrap',
+                  borderTop: product.description ? 'none' : `1px solid ${COLORS.border}`,
+                }}>
+                  <button
+                    onClick={() => handleToggleAvailable(product)}
+                    style={badgeStyle(product.available, '#34d399', '#0a2e1f', '#34d399')}>
+                    {product.available ? 'DISPONIBLE' : 'NO DISPONIBLE'}
+                  </button>
+                  <button
+                    onClick={() => handleToggleFeatured(product)}
+                    style={badgeStyle(product.featured, COLORS.accent, COLORS.accentBg, COLORS.accent)}>
+                    {product.featured ? 'DESTACADO' : 'NO DESTACADO'}
+                  </button>
+                  <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+                    <button onClick={() => handleEdit(product)} style={{
+                      background: COLORS.surface2,
+                      border: `1px solid ${COLORS.border2}`,
+                      color: COLORS.textDim, padding: '5px 12px',
+                      borderRadius: 4, fontSize: 10,
+                      cursor: 'pointer', fontFamily: FONT_MONO,
+                    }}>EDITAR</button>
+                    <button onClick={() => setConfirmDelete(product)} style={{
+                      background: COLORS.dangerBg,
+                      border: `1px solid ${COLORS.danger}33`,
+                      color: COLORS.danger, padding: '5px 12px',
+                      borderRadius: 4, fontSize: 10,
+                      cursor: 'pointer', fontFamily: FONT_MONO,
+                    }}>ELIMINAR</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
 
         {!loading && filtered.length === 0 && (
@@ -356,17 +349,21 @@ export default function AdminView() {
         <div onClick={handleCancel} style={{
           position: 'fixed', inset: 0,
           background: 'rgba(0,0,0,0.8)', zIndex: 50,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: 16, animation: 'fadeIn 0.2s ease',
+          display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+          animation: 'fadeIn 0.2s ease',
         }}>
           <div onClick={e => e.stopPropagation()} style={{
             background: COLORS.surface,
             border: `1px solid ${COLORS.border}`,
-            borderRadius: 12, width: '100%',
-            maxWidth: 480, maxHeight: '90vh',
-            overflowY: 'auto', padding: 24,
+            borderRadius: '16px 16px 0 0',
+            width: '100%', maxWidth: 560,
+            maxHeight: '92vh', overflowY: 'auto',
+            padding: '20px 20px 32px',
           }}>
-            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 20, color: COLORS.text }}>
+            {/* Handle */}
+            <div style={{ width: 36, height: 4, background: COLORS.border2, borderRadius: 2, margin: '0 auto 20px' }} />
+
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 20, color: COLORS.text }}>
               {editingId ? 'EDITAR PRODUCTO' : 'NUEVO PRODUCTO'}
             </div>
 
@@ -383,11 +380,11 @@ export default function AdminView() {
                   <label style={{
                     background: COLORS.surface2,
                     border: `1px dashed ${COLORS.border2}`,
-                    color: COLORS.textDim, padding: '8px 16px',
+                    color: COLORS.textDim, padding: '10px 16px',
                     borderRadius: 6, fontSize: 11,
                     cursor: 'pointer', fontFamily: FONT_MONO,
                   }}>
-                    {imagePreview ? 'CAMBIAR IMAGEN' : 'SUBIR IMAGEN'}
+                    {imagePreview ? 'CAMBIAR' : 'SUBIR IMAGEN'}
                     <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
                   </label>
                 </div>
@@ -462,7 +459,7 @@ export default function AdminView() {
                 <button onClick={handleCancel} style={{
                   flex: 1, background: 'transparent',
                   border: `1px solid ${COLORS.border2}`,
-                  color: COLORS.textMuted, padding: '10px',
+                  color: COLORS.textMuted, padding: '12px',
                   borderRadius: 6, cursor: 'pointer',
                   fontSize: 12, fontFamily: FONT_MONO,
                 }}>CANCELAR</button>
@@ -470,7 +467,7 @@ export default function AdminView() {
                   flex: 2,
                   background: saving ? COLORS.surface2 : COLORS.accent,
                   color: saving ? COLORS.textMuted : '#000',
-                  border: 'none', padding: '10px',
+                  border: 'none', padding: '12px',
                   borderRadius: 6, cursor: saving ? 'default' : 'pointer',
                   fontSize: 12, fontWeight: 700, fontFamily: FONT_MONO,
                   transition: 'all 0.15s',
@@ -482,6 +479,7 @@ export default function AdminView() {
           </div>
         </div>
       )}
+
       {/* MODAL CONFIRMAR ELIMINAR */}
       {confirmDelete && (
         <div onClick={() => setConfirmDelete(null)} style={{
@@ -494,29 +492,29 @@ export default function AdminView() {
             background: COLORS.surface,
             border: `1px solid ${COLORS.danger}33`,
             borderRadius: 12, padding: 24,
-            width: '100%', maxWidth: 380,
+            width: '100%', maxWidth: 340,
           }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: COLORS.text, marginBottom: 8 }}>
               ELIMINAR PRODUCTO
             </div>
             <div style={{ fontSize: 12, color: COLORS.textDim, marginBottom: 20, lineHeight: 1.6 }}>
-              ¿Estás seguro que deseas eliminar <b style={{ color: COLORS.text }}>{confirmDelete.name}</b>? Esta acción no se puede deshacer.
+              ¿Eliminar <b style={{ color: COLORS.text }}>{confirmDelete.name}</b>? Esta acción no se puede deshacer.
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={() => setConfirmDelete(null)} style={{
                 flex: 1, background: 'transparent',
                 border: `1px solid ${COLORS.border2}`,
-                color: COLORS.textMuted, padding: '10px',
+                color: COLORS.textMuted, padding: '11px',
                 borderRadius: 6, cursor: 'pointer',
                 fontSize: 12, fontFamily: FONT_MONO,
               }}>CANCELAR</button>
               <button onClick={handleDelete} style={{
                 flex: 1, background: COLORS.dangerBg,
                 border: `1px solid ${COLORS.danger}`,
-                color: COLORS.danger, padding: '10px',
+                color: COLORS.danger, padding: '11px',
                 borderRadius: 6, cursor: 'pointer',
                 fontSize: 12, fontWeight: 700, fontFamily: FONT_MONO,
-              }}>SÍ, ELIMINAR</button>
+              }}>ELIMINAR</button>
             </div>
           </div>
         </div>
