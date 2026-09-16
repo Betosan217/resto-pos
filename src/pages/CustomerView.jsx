@@ -63,7 +63,20 @@ export default function CustomerView() {
           </div>
         </div>
       </div>
-
+      {/* Aviso imágenes ilustrativas */}
+      <div style={{
+        marginTop: 10,
+        padding: '7px 12px',
+        background: '#1a1400',
+        border: '1px solid #f59e0b33',
+        borderRadius: 6,
+        fontSize: 10,
+        color: '#f59e0b99',
+        letterSpacing: 0.5,
+        lineHeight: 1.5,
+      }}>
+        Las imágenes son únicamente con fines ilustrativos. El producto final puede variar en presentación.
+      </div>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 24px 40px' }}>
 
         {/* DESTACADOS */}
@@ -232,6 +245,16 @@ export default function CustomerView() {
               }}>
                 Cerrar
               </button>
+              {/* Aviso imágenes ilustrativas */}
+              <div style={{
+                marginTop: 12,
+                fontSize: 10,
+                color: COLORS.textMuted,
+                textAlign: 'center',
+                lineHeight: 1.5,
+              }}>
+                * Las imágenes son únicamente con fines ilustrativos.
+              </div>
             </div>
           </div>
         </div>
